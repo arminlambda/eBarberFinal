@@ -1,0 +1,51 @@
+@model eBarber.Models.Ocena
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Ocena</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Stevilka" class="control-label"></label>
+                <input asp-for="Stevilka" class="form-control" />
+                <span asp-validation-for="Stevilka" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Komentar" class="control-label"></label>
+                <input asp-for="Komentar" class="form-control" />
+                <span asp-validation-for="Komentar" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DatumOcene" class="control-label"></label>
+                <input asp-for="DatumOcene" class="form-control" />
+                <span asp-validation-for="DatumOcene" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TerminId" class="control-label"></label>
+                <select asp-for="TerminId" class ="form-control" asp-items="ViewBag.TerminId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="StrankaId" class="control-label"></label>
+                <select asp-for="StrankaId" class ="form-control" asp-items="ViewBag.StrankaId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

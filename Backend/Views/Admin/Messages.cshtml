@@ -1,0 +1,48 @@
+@model IEnumerable<eBarber.Models.Message>
+
+@{
+    ViewData["Title"] = "Sporočila";
+}
+
+<h1>💬 Sporočila uporabnikov</h1>
+
+<table class="table mt-4">
+    <thead>
+        <tr>
+            <th>Datum</th>
+            <th>Od</th>
+            <th>Sporočilo</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var msg in Model)
+        {
+            <tr class="@(msg.IsRead ? "" : "table-warning")">
+                <td>@msg.SentAt.ToString("dd.MM.yyyy HH:mm")</td>
+                <td>@msg.Sender?.Email</td>
+                <td>@msg.Content</td>
+                <td>
+                    @if (msg.IsRead)
+                    {
+                        <span class="badge bg-secondary">Prebrano</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning">Novo</span>
+                    }
+                </td>
+                <td>
+                    @if (!msg.IsRead)
+                    {
+                        <form asp-action="MarkAsRead" method="post" style="display:inline;">
+                            <input type="hidden" name="messageId" value="@msg.Id" />
+                            <button type="submit" class="btn btn-sm btn-primary">Označi kot prebrano</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

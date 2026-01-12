@@ -1,0 +1,54 @@
+@model IEnumerable<dynamic>
+
+@{
+    ViewData["Title"] = "Stranke";
+}
+
+<h1>👥 Stranke</h1>
+
+<table class="table table-striped mt-4">
+    <thead>
+        <tr>
+            <th>Ime</th>
+            <th>Email</th>
+            <th>Termini</th>
+            <th>Prihodi</th>
+            <th>Preklici</th>
+            <th>Zanesljivost</th>
+            <th>Ocena</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.FirstName @user.LastName</td>
+                <td>@user.Email</td>
+                <td>@user.TotalBookings</td>
+                <td class="text-success">@user.CompletedBookings</td>
+                <td class="text-danger">@user.CancelledBookings</td>
+                <td>
+                    <span class="badge @(user.ReliabilityScore > 0.8m ? "bg-success" : user.ReliabilityScore > 0.5m ? "bg-warning" : "bg-danger")">
+                        @((user.ReliabilityScore * 100).ToString("F0"))%
+                    </span>
+                </td>
+                <td>
+                    @if (user.AverageRating > 0)
+                    {
+                        <span>@user.AverageRating.ToString("F1") ⭐</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">-</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="UserDetails" asp-route-id="@user.Id" class="btn btn-sm btn-primary">
+                        Podrobnosti
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

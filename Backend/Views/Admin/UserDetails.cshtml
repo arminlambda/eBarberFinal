@@ -1,0 +1,153 @@
+@{
+    ViewData["Title"] = "Podrobnosti stranke";
+    var user = ViewBag.User as eBarber.Models.ApplicationUser;
+    var prijave = ViewBag.Prijave as List<eBarber.Models.PrijavaTermina>;
+}
+
+<h1>👤 @user!.FirstName @user.LastName</h1>
+
+<div class="card mt-3">
+    <div class="card-body">
+        <p><strong>Email:</strong> @user.Email</p>
+        <p><strong>Skupaj terminov:</strong> @user.TotalBookings</p>
+        <p><strong>Prihodi:</strong> <span class="text-success">@user.CompletedBookings</span></p>
+        <p><strong>Preklici:</strong> <span class="text-danger">@user.CancelledBookings</span></p>
+        <p><strong>Zanesljivost:</strong> @((user.ReliabilityScore * 100).ToString("F0"))%</p>
+        <p><strong>Povprečna ocena:</strong> @user.AverageRating.ToString("F1") ⭐</p>
+    </div>
+</div>
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card mt-3">
+    <div class="card-header">
+        <h5>⚙️ Ročno urejanje</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Nastavi povprečno oceno</h6>
+                <form asp-action="SetUserRating" method="post" class="d-flex gap-2">
+                    <input type="hidden" name="userId" value="@user!.Id" />
+                    <input type="number" name="rating" class="form-control" 
+                           min="0" max="5" step="0.1" 
+                           value="@user.AverageRating" 
+                           placeholder="0.0 - 5.0" required />
+                    <button type="submit" class="btn btn-primary">Shrani oceno</button>
+                </form>
+                <small class="text-muted">Vnesi število med 0.0 in 5.0</small>
+            </div>
+
+            
+            <div class="col-md-6">
+                <h6>Posodobi statistiko</h6>
+                <form asp-action="UpdateUserStats" method="post">
+                    <input type="hidden" name="userId" value="@user.Id" />
+                    <div class="row g-2">
+                        <div class="col-4">
+                            <input type="number" name="totalBookings" class="form-control form-control-sm" 
+                                   value="@user.TotalBookings" placeholder="Skupaj" min="0" required />
+                            <small class="text-muted">Skupaj</small>
+                        </div>
+                        <div class="col-4">
+                            <input type="number" name="completedBookings" class="form-control form-control-sm" 
+                                   value="@user.CompletedBookings" placeholder="Prihodi" min="0" required />
+                            <small class="text-muted">Prihodi</small>
+                        </div>
+                        <div class="col-4">
+                            <input type="number" name="cancelledBookings" class="form-control form-control-sm" 
+                                   value="@user.CancelledBookings" placeholder="Preklici" min="0" required />
+                            <small class="text-muted">Preklici</small>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary mt-2">Posodobi</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<h3 class="mt-4">Zgodovina terminov</h3>
+
+@if (prijave == null || !prijave.Any())
+{
+    <p class="text-muted">Ni terminov.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Datum</th>
+                <th>Lokacija</th>
+                <th>Status</th>
+                <th>Prispel</th>
+                <th>Ocena</th>
+                <th>Opombe</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in prijave)
+            {
+                <tr>
+                    <td>@p.OkvirniTermin?.ZacetekCasa.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@p.OkvirniTermin?.Lokacija?.Naslov</td>
+                    <td>
+                        <span class="badge bg-@(p.Status == "Potrjena" ? "success" : "danger")">
+                            @p.Status
+                        </span>
+                    </td>
+                    <td>
+                        @if (p.JePrispel)
+                        {
+                            <span class="text-success">✅ Prispel</span>
+                        }
+                        else if (p.OkvirniTermin?.ZacetekCasa < DateTime.Now)
+                        {
+                            <form asp-action="CheckIn" method="post" style="display:inline;">
+                                <input type="hidden" name="prijavaId" value="@p.Id" />
+                                <button type="submit" class="btn btn-sm btn-success">Check-in</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="text-muted">-</span>
+                        }
+                    </td>
+                    <td>
+                        @if (p.OcenaStranke.HasValue)
+                        {
+                            <span>@p.OcenaStranke ⭐</span>
+                        }
+                        else if (p.JePrispel)
+                        {
+                            <form asp-action="RateUser" method="post" class="d-inline-flex gap-1">
+                                <input type="hidden" name="prijavaId" value="@p.Id" />
+                                <select name="rating" class="form-select form-select-sm" style="width: 80px;" required>
+                                    <option value="">Oceni</option>
+                                    <option value="5">5 ⭐</option>
+                                    <option value="4">4 ⭐</option>
+                                    <option value="3">3 ⭐</option>
+                                    <option value="2">2 ⭐</option>
+                                    <option value="1">1 ⭐</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-primary">Shrani</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="text-muted">-</span>
+                        }
+                    </td>
+                    <td>@p.Opombe</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a asp-action="Users" class="btn btn-secondary mt-3">Nazaj na stranke</a>

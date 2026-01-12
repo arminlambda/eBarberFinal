@@ -1,0 +1,60 @@
+@model dynamic
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h1>📊 Admin Dashboard</h1>
+
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Uporabniki</h5>
+                <h2>@Model.TotalUsers</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Današnji termini</h5>
+                <h2>@Model.TodaysAppointments</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Nova sporočila</h5>
+                <h2>@Model.PendingMessages</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Povprečna ocena</h5>
+                <h2>@Model.AverageRating.ToString("F2") ⭐</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <a asp-action="Users" class="btn btn-lg btn-primary w-100">
+            👥 Upravljanje strank
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="OkvirniTermini" asp-action="Index" class="btn btn-lg btn-success w-100">
+            📅 Okvirni termini
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-action="Messages" class="btn btn-lg btn-warning w-100">
+            💬 Sporočila
+        </a>
+    </div>
+</div>
